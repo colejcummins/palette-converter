@@ -15,55 +15,31 @@ public class GPLReader {
             inp = new BufferedReader( new FileReader(filename) );
         } catch (Exception e) {
             throw new IllegalArgumentException("Can't open file: \"" + filename +
-                "\" for input. \nError: " + e);
+                "\" for input. \nError: " + e.getMessage());
         }
-
-        protectedReadLine();
-        protectedReadLine();
-/** 
+=   
         try {
             readHeader();
         } catch (Exception e) {
-            throw new IOException(e.getMessage())
+            throw new IOException(e.getMessage());
         }
-        **/
     }
 
 
     public void readHeader() throws IOException {
-        String str; 
-        if ( !inp.readLine().equals("GIMP Palette") ) {
-            line++;
-            throw new IOException("Malformed file at line " + line);
-        } 
-
         try {
-            str = inp.readLine();
+            if ( !this.readLine().equals("GIMP Palette") ||
+                 !this.readLine().substring(0, 5).equals("Name:") ||
+                 !this.readLine().substring(0, 8).equals("Columns:") ||
+                 !this.readLine().equals("#") )
+                throw new IOException("Malformed header at line " + line);
         } catch (Exception e) {
-            throw new IOException();
+            throw new IOException("Malformed header at line " + line);
         }
-
-        line++;
-
-        
-
-        str = inp.readLine();
-        line++;
-
-        if ( str.length() < 8 ) 
-            throw new IOException("Malformed file at line " + line);
-        if ( !str.substring(0, 8).equals("Columns:") ) 
-            throw new IOException("Malformed file at line " + line);
-
-        str = inp.readLine();
-        line++;
-
-        if ( !str.equals("#") )
-            throw new IOException("Malformed file at line " + line);
     }
 
     
-    public String protectedReadLine() throws IOException {
+    public String readLine() throws IOException {
         String str;
         try {
             line++;
@@ -80,12 +56,22 @@ public class GPLReader {
     }
 
 
-    public Color readColor() throws IOException {
-
+    public Color readColor() {
+        String str;
+        try {
+            str = this.readLine();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        
     }
 
 
-    public void close() {
-        inp.close();
+    public void protectedClose() {
+        try {
+            inp.close();
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage() + "\nprotectedClose failed");
+        }
     }
 }
